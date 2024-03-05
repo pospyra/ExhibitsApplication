@@ -36,7 +36,7 @@
             // button1
             // 
             this.button1.Location = new System.Drawing.Point(40, 529);
-            this.button1.Margin = new System.Windows.Forms.Padding(4, 4, 4, 4);
+            this.button1.Margin = new System.Windows.Forms.Padding(4);
             this.button1.Name = "button1";
             this.button1.Size = new System.Drawing.Size(100, 34);
             this.button1.TabIndex = 0;
@@ -47,7 +47,7 @@
             // button2
             // 
             this.button2.Location = new System.Drawing.Point(1132, 520);
-            this.button2.Margin = new System.Windows.Forms.Padding(4, 4, 4, 4);
+            this.button2.Margin = new System.Windows.Forms.Padding(4);
             this.button2.Name = "button2";
             this.button2.Size = new System.Drawing.Size(100, 34);
             this.button2.TabIndex = 1;
@@ -57,11 +57,11 @@
             // 
             // button3
             // 
-            this.button3.Location = new System.Drawing.Point(1167, 12);
+            this.button3.Location = new System.Drawing.Point(1109, 12);
             this.button3.Name = "button3";
-            this.button3.Size = new System.Drawing.Size(94, 45);
+            this.button3.Size = new System.Drawing.Size(152, 45);
             this.button3.TabIndex = 2;
-            this.button3.Text = "⏯️";
+            this.button3.Text = "Запустить";
             this.button3.UseVisualStyleBackColor = true;
             this.button3.Click += new System.EventHandler(this.button3_Click);
             // 
@@ -74,7 +74,7 @@
             this.Controls.Add(this.button2);
             this.Controls.Add(this.button1);
             this.Font = new System.Drawing.Font("Microsoft YaHei UI", 9.75F);
-            this.Margin = new System.Windows.Forms.Padding(4, 4, 4, 4);
+            this.Margin = new System.Windows.Forms.Padding(4);
             this.Name = "SlideShowForm";
             this.Text = "SlideShowForm";
             this.ResumeLayout(false);

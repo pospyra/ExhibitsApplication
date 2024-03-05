@@ -24,15 +24,23 @@ namespace ExhibitsApplication
 
         private void DisplayExhibits(List<ExhibitsModel> exhibits)
         {
+            // Определение параметров карточек
+            int cardWidth = 200;
+            int cardHeight = 250;
+            int maxCardsPerRow = 5;
+            int cardSpacingX = 20;
+            int cardSpacingY = 20;
+
+            // Вычисление общей ширины карточек и промежутков между ними
+            int totalCardWidth = maxCardsPerRow * (cardWidth + cardSpacingX) - cardSpacingX;
+            // Вычисление смещения по горизонтали для центрирования
+            int offsetX = (this.Width - totalCardWidth) / 2;
+
+            // Определение начальной координаты Y для первой строки
             int startY = 100;
-            int cardWidth = 200; // Ширина карточки
-            int cardHeight = 250; // Высота карточки (увеличена с 250 до 300)
-            int maxCardsPerRow = 5; // Максимальное количество карточек в строке
-            int cardSpacingX = 20; // Расстояние между карточками по горизонтали
-            int cardSpacingY = 20; // Расстояние между карточками по вертикали
 
             int currentCardsInRow = 0;
-            int currentX = 20;
+            int currentX = offsetX;
 
             foreach (var exhibit in exhibits)
             {
@@ -95,7 +103,7 @@ namespace ExhibitsApplication
                 else
                 {
                     startY += cardHeight + cardSpacingY; // Переход на следующую строку
-                    currentX = 20;
+                    currentX = offsetX;
                     currentCardsInRow = 0;
                 }
             }
