@@ -1,7 +1,7 @@
-﻿using DocumentFormat.OpenXml;
-using DocumentFormat.OpenXml.Packaging;
+﻿using DocumentFormat.OpenXml.Packaging;
 using DocumentFormat.OpenXml.Wordprocessing;
 using ExhibitsApplication.Models;
+using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
@@ -10,9 +10,17 @@ namespace ExhibitsApplication.Services
 {
     public class MuseumExhibitParser
     {
-        public List<ExhibitsModel> ParseWordDocument(string filePath)
+        private ExhibitsStorage storage;
+        public MuseumExhibitParser()
         {
-            List<ExhibitsModel> exhibitsList = new List<ExhibitsModel>();
+            storage = ExhibitsStorage.GetInstance();
+            storage.Clear();
+        }
+
+        public void ParseWordDocument(string filePath)
+        {
+            ExhibitsStorage storage = ExhibitsStorage.GetInstance();
+            storage.Clear();
 
             using (WordprocessingDocument wordDoc = WordprocessingDocument.Open(filePath, false))
             {
@@ -22,6 +30,7 @@ namespace ExhibitsApplication.Services
                 {
                     var rows = table.Elements<TableRow>();
                     var exhibit = new ExhibitsModel();
+                    byte[] imageData = null;
 
                     foreach (var row in rows)
                     {
@@ -31,7 +40,7 @@ namespace ExhibitsApplication.Services
                         // Извлекаем данные из ячеек таблицы
                         if (cellTexts.Count > 1)
                         {
-
+                            // Парсим информацию об выставке
                             if (cellTexts[0].Contains("Инвентарный номер:"))
                             {
                                 var splitTexts = cellTexts[0].Split(':');
@@ -43,6 +52,7 @@ namespace ExhibitsApplication.Services
                                 exhibit.Name = splitTexts[1].Trim();
                             }
 
+                            // Парсим информацию об выставке
                             switch (cellTexts[0])
                             {
                                 case "шифр фондовой коллекции":
@@ -76,35 +86,31 @@ namespace ExhibitsApplication.Services
                         }
                     }
 
-                    // Обработка фотографии, следующей за таблицей
-                    var nextSibling = table.NextSibling();
-                    if (nextSibling != null && nextSibling is Paragraph)
-                    {
-                        var run = nextSibling.GetFirstChild<Run>();
-                        if (run != null && run.GetFirstChild<DocumentFormat.OpenXml.Drawing.Blip>() != null)
-                        {
-                            var blip = run.GetFirstChild<DocumentFormat.OpenXml.Drawing.Blip>();
-                            var embed = blip.Embed;
-                            if (embed != null)
-                            {
-                                var imageData = (wordDoc.MainDocumentPart.GetPartById(embed) as ImagePart).GetStream();
-                                if (imageData != null)
-                                {
-                                    using (MemoryStream ms = new MemoryStream())
-                                    {
-                                        imageData.CopyTo(ms);
-                                        exhibit.Photo = ms.ToArray();
-                                    }
-                                }
-                            }
-                        }
-                    }
-
-                    exhibitsList.Add(exhibit);
+                    // Сохранение данных о выставке вместе с изображением
+                    exhibit.Photo = imageData;
+                    storage.AddExhibit(exhibit);
                 }
             }
-
-            return exhibitsList;
         }
+
+
+        public List<ExhibitsModel> GetExhibitsByFilter(string searchTerm)
+        {
+            List<ExhibitsModel> exhibits = storage.GetAllExhibits();
+
+            if (String.IsNullOrEmpty(searchTerm))
+            {
+                return exhibits;
+            }
+
+            string lowerSearchTerm = searchTerm.ToLower();
+
+            var filteredExhibits = exhibits
+                .Where(exhibit => exhibit.Name.ToLower()
+                .Contains(lowerSearchTerm)).ToList();
+
+            return filteredExhibits;
+        }
+
     }
 }

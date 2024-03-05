@@ -1,13 +1,10 @@
-﻿using ExhibitsApplication.Models;
+﻿using ExhibitsApplication.Forms;
+using ExhibitsApplication.Models;
 using ExhibitsApplication.Services;
 using System;
 using System.Collections.Generic;
-using System.ComponentModel;
-using System.Data;
 using System.Drawing;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
+using System.IO;
 using System.Windows.Forms;
 
 namespace ExhibitsApplication
@@ -15,67 +12,102 @@ namespace ExhibitsApplication
     public partial class Form1 : Form
     {
         private MuseumExhibitParser exhibitParser;
-
+        private ExhibitsStorage exhibitsStorage;
         public Form1()
         {
             InitializeComponent();
+            this.CenterToScreen();
             exhibitParser = new MuseumExhibitParser();
+            exhibitsStorage = ExhibitsStorage.GetInstance();
             this.AutoScroll = true;
         }
-        private void browseButton_Click(object sender, EventArgs e)
-        {
-            OpenFileDialog openFileDialog = new OpenFileDialog();
-            openFileDialog.Filter = "Word Documents|*.docx;*.doc";
 
-            if (openFileDialog.ShowDialog() == DialogResult.OK)
-            {
-                string filePath = openFileDialog.FileName;
-                List<ExhibitsModel> exhibits = exhibitParser.ParseWordDocument(filePath);
-                DisplayExhibits(exhibits);
-            }
-        }
         private void DisplayExhibits(List<ExhibitsModel> exhibits)
         {
-            int startY = 20;
-            int dataGridViewWidth = 600; // Указываем новую ширину DataGridView
+            int startY = 100;
+            int cardWidth = 200; // Ширина карточки
+            int cardHeight = 250; // Высота карточки (увеличена с 250 до 300)
+            int maxCardsPerRow = 5; // Максимальное количество карточек в строке
+            int cardSpacingX = 20; // Расстояние между карточками по горизонтали
+            int cardSpacingY = 20; // Расстояние между карточками по вертикали
+
+            int currentCardsInRow = 0;
+            int currentX = 20;
 
             foreach (var exhibit in exhibits)
             {
-                DataGridView dataGridView = new DataGridView();
-                dataGridView.Location = new System.Drawing.Point(20, startY);
-                dataGridView.Size = new System.Drawing.Size(dataGridViewWidth, 300);
-                dataGridView.AllowUserToAddRows = false;
-                dataGridView.AutoSizeColumnsMode = DataGridViewAutoSizeColumnsMode.Fill; // Режим заполнения столбцов
+                TableLayoutPanel cardPanel = new TableLayoutPanel();
+                cardPanel.Size = new Size(cardWidth, cardHeight);
+                cardPanel.BorderStyle = BorderStyle.FixedSingle; // Добавляем рамку карточке
+                cardPanel.Location = new Point(currentX, startY);
+                cardPanel.Cursor = Cursors.Hand; // Добавляем курсор при наведении на карточку
+                cardPanel.Click += (sender, e) => ShowExhibitForm(exhibit);
 
-                dataGridView.Columns.Add("Property", "");
-                dataGridView.Columns.Add("Value", "");
+                // Добавим строку для изображения
+                cardPanel.RowStyles.Add(new RowStyle(SizeType.Absolute, 150));
 
-                // Установка свойства WrapMode для второго столбца
-                dataGridView.Columns[1].DefaultCellStyle.WrapMode = DataGridViewTriState.True;
+                PictureBox pictureBox = new PictureBox();
+                pictureBox.Dock = DockStyle.Fill;
+                pictureBox.SizeMode = PictureBoxSizeMode.Zoom;
+                pictureBox.BackColor = Color.Blue; // Синий фон
+                pictureBox.Padding = new Padding((cardWidth - pictureBox.Width) / 2, (cardHeight - pictureBox.Height) / 2, 0, 0);
+                if (exhibit.Photo != null)
+                {
+                    using (MemoryStream ms = new MemoryStream(exhibit.Photo))
+                    {
+                        pictureBox.Image = Image.FromStream(ms);
+                    }
+                }
+                pictureBox.Size = new Size(cardWidth, 150);
+                cardPanel.Controls.Add(pictureBox, 0, 0);
 
-                dataGridView.Rows.Add("Инвентарный номер:", exhibit.InventoryNumber);
-                dataGridView.Rows.Add("Название:", exhibit.Name);
-                dataGridView.Rows.Add("Шифр фондовой коллекции:", exhibit.FundCode);
-                dataGridView.Rows.Add("Место и время изготовления:", exhibit.Year);
-                dataGridView.Rows.Add("Количество:", exhibit.Quantity);
-                dataGridView.Rows.Add("Материал, техника изготовления:", exhibit.Material);
-                dataGridView.Rows.Add("Размер:", exhibit.Size);
-                dataGridView.Rows.Add("Состояние сохранности:", exhibit.Condition);
-                dataGridView.Rows.Add("Описание музейного предмета:", exhibit.Description);
-                dataGridView.Rows.Add("Источник поступления:", exhibit.Source);
-                dataGridView.Rows.Add("Дата регистрации:", exhibit.RegistratonDate);
+                // Добавим вторую строку для текста
+                cardPanel.RowStyles.Add(new RowStyle(SizeType.AutoSize));
 
-                dataGridView.AutoSizeRowsMode = DataGridViewAutoSizeRowsMode.AllCells;
+                Label yearLabel = new Label();
+                yearLabel.Text = exhibit.Year;
+                yearLabel.AutoSize = true;
+                yearLabel.Margin = new Padding(5);
+                cardPanel.Controls.Add(yearLabel, 0, 2); // Добавляем третью строку для года экспоната
 
-                // Автоматическое изменение высоты ячеек под содержимое
-                dataGridView.AutoResizeRows();
+                Label nameLabel = new Label();
+                nameLabel.Text = exhibit.Name;
+                nameLabel.AutoSize = true;
+                nameLabel.Margin = new Padding(3);
+                nameLabel.Click += (sender, e) => ShowExhibitForm(exhibit);
+                cardPanel.Controls.Add(nameLabel, 0, 1);
+                cardPanel.Controls.Add(yearLabel, 0, 2);
 
-                this.Controls.Add(dataGridView);
-                startY += 320;
+                nameLabel.Height = 30; // Задаем высоту nameLabel
+
+                // Устанавливаем одинаковые отступы для меток
+                nameLabel.Padding = new Padding(5);
+                yearLabel.Padding = new Padding(5);
+
+                this.Controls.Add(cardPanel);
+
+                currentCardsInRow++;
+
+                if (currentCardsInRow < maxCardsPerRow)
+                {
+                    currentX += cardWidth + cardSpacingX;
+                }
+                else
+                {
+                    startY += cardHeight + cardSpacingY; // Переход на следующую строку
+                    currentX = 20;
+                    currentCardsInRow = 0;
+                }
             }
         }
 
 
+
+        private void ShowExhibitForm(ExhibitsModel exhibit)
+        {
+            ExhibitsForm exhibitForm = new ExhibitsForm(exhibit);
+            exhibitForm.Show();
+        }
 
         private void browseButton_Click_1(object sender, EventArgs e)
         {
@@ -85,10 +117,40 @@ namespace ExhibitsApplication
             if (openFileDialog.ShowDialog() == DialogResult.OK)
             {
                 string filePath = openFileDialog.FileName;
-                List<ExhibitsModel> exhibits = exhibitParser.ParseWordDocument(filePath);
-                DisplayExhibits(exhibits);
+                exhibitParser.ParseWordDocument(filePath);
+                DisplayExhibits(exhibitsStorage.GetAllExhibits());
             }
+        }
+
+        private void button1_Click(object sender, EventArgs e)
+        {
+            ClearExhibitCards();
+            string name = textBox1.Text;
+            var filteredList = exhibitParser.GetExhibitsByFilter(name);
+            DisplayExhibits(filteredList);
+        }
+        private void ClearExhibitCards()
+        {
+            List<Control> controlsToRemove = new List<Control>();
+
+            foreach (Control control in this.Controls)
+            {
+                if (control is Panel)
+                {
+                    controlsToRemove.Add(control);
+                }
+            }
+
+            foreach (Control control in controlsToRemove)
+            {
+                this.Controls.Remove(control);
+                control.Dispose(); // Освобождаем ресурсы
+            }
+        }
+
+        private void button2_Click(object sender, EventArgs e)
+        {
+            new SlideShowForm().ShowDialog();   
         }
     }
 }
-
