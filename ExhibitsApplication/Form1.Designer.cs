@@ -48,7 +48,7 @@
             // 
             // button1
             // 
-            this.button1.Location = new System.Drawing.Point(646, 23);
+            this.button1.Location = new System.Drawing.Point(625, 23);
             this.button1.Margin = new System.Windows.Forms.Padding(5);
             this.button1.Name = "button1";
             this.button1.Size = new System.Drawing.Size(101, 28);
@@ -60,12 +60,13 @@
             // 
             // textBox1
             // 
-            this.textBox1.Location = new System.Drawing.Point(431, 23);
+            this.textBox1.Location = new System.Drawing.Point(410, 23);
             this.textBox1.Margin = new System.Windows.Forms.Padding(5);
             this.textBox1.Name = "textBox1";
             this.textBox1.Size = new System.Drawing.Size(205, 24);
             this.textBox1.TabIndex = 3;
             this.textBox1.Visible = false;
+            this.textBox1.KeyPress += new System.Windows.Forms.KeyPressEventHandler(this.textBox1_KeyPress);
             // 
             // button2
             // 

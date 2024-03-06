@@ -25,7 +25,7 @@ namespace ExhibitsApplication
         private void DisplayExhibits(List<ExhibitsModel> exhibits)
         {
             // Определение параметров карточек
-            int cardWidth = 200;
+            int cardWidth = 220;
             int cardHeight = 250;
             int maxCardsPerRow = 5;
             int cardSpacingX = 20;
@@ -55,9 +55,11 @@ namespace ExhibitsApplication
                 cardPanel.RowStyles.Add(new RowStyle(SizeType.Absolute, 150));
 
                 PictureBox pictureBox = new PictureBox();
-                pictureBox.Dock = DockStyle.Fill;
+
+                pictureBox.Size = new Size(cardWidth, 200); 
+
                 pictureBox.SizeMode = PictureBoxSizeMode.Zoom;
-                pictureBox.BackColor = Color.Gray; // Синий фон (для отладки)
+
                 if (exhibit.Photo != null)
                 {
                     using (MemoryStream ms = new MemoryStream(exhibit.Photo))
@@ -68,7 +70,6 @@ namespace ExhibitsApplication
                 cardPanel.Controls.Add(pictureBox, 0, 0);
 
 
-                // Добавим вторую строку для текста
                 cardPanel.RowStyles.Add(new RowStyle(SizeType.AutoSize));
 
                 Label cipherLabel = new Label();
@@ -82,17 +83,13 @@ namespace ExhibitsApplication
                 nameLabel.Text = exhibit.Name;
                 nameLabel.AutoSize = true;
                 nameLabel.Margin = new Padding(1);
-                nameLabel.Font = new Font(nameLabel.Font.FontFamily, 11); // Устанавливаем размер шрифта 10
+                nameLabel.Font = new Font(nameLabel.Font.FontFamily, 11); 
 
-                //nameLabel.Height = 30;
                 nameLabel.Click += (sender, e) => ShowExhibitForm(exhibit);
 
                 cardPanel.Controls.Add(nameLabel, 0, 1);
                 cardPanel.Controls.Add(cipherLabel, 0, 2);
 
-
-
-                // Устанавливаем одинаковые отступы для меток
                 nameLabel.Padding = new Padding(2);
                 cipherLabel.Padding = new Padding(2);
 
@@ -136,16 +133,19 @@ namespace ExhibitsApplication
                 textBox1.Visible = true;
                 button1.Visible = true;
                 button2.Visible = true;
-
             }
         }
 
-        private void button1_Click(object sender, EventArgs e)
+        private void GetGilteredExhibits()
         {
             ClearExhibitCards();
             string name = textBox1.Text;
             var filteredList = exhibitParser.GetExhibitsByFilter(name);
             DisplayExhibits(filteredList);
+        }
+        private void button1_Click(object sender, EventArgs e)
+        {
+            GetGilteredExhibits();
         }
 
         private void ClearExhibitCards()
@@ -170,6 +170,16 @@ namespace ExhibitsApplication
         private void button2_Click(object sender, EventArgs e)
         {
             new SlideShowForm().ShowDialog();   
+        }
+
+        private void textBox1_KeyPress(object sender, KeyPressEventArgs e)
+        {
+            if (e.KeyChar == (char)Keys.Enter)
+            {
+                GetGilteredExhibits();
+
+                e.Handled = true;
+            }
         }
     }
 }
