@@ -1,5 +1,6 @@
 ﻿using ExhibitsApplication.Models;
 using System.Drawing;
+using System.IO;
 using System.Windows.Forms;
 
 namespace ExhibitsApplication.Forms
@@ -66,13 +67,28 @@ namespace ExhibitsApplication.Forms
             this.Controls.Add(dataGridView);
 
             // Размещаем PictureBox справа от таблицы
+
+            // Определяем размеры и размещение PictureBox
+            int pictureBoxHeight = dataGridView.Height; // Высота PictureBox будет такой же, как у DataGridView
+            int pictureBoxX = currentX + dataGridViewWidth + tableSpacing; // Располагаем справа от DataGridView
+            int pictureBoxY = startY + nameLabel.Height; // Учитываем высоту метки
+
             PictureBox pictureBox = new PictureBox();
-            pictureBox.Location = new Point(currentX + dataGridViewWidth + tableSpacing, startY + nameLabel.Height + tableSpacing);
-            pictureBox.Size = new Size(pictureBoxWidth, dataGridView.Height);
+            pictureBox.Location = new Point(pictureBoxX, pictureBoxY);
+            pictureBox.Size = new Size(pictureBoxWidth, pictureBoxHeight); // Изменяем размер PictureBox
             pictureBox.SizeMode = PictureBoxSizeMode.Zoom;
             pictureBox.BackColor = Color.Blue; // Просто для демонстрации, замените на вашу фотографию
-            this.Controls.Add(pictureBox);
 
+            // Проверяем, что фотография доступна в модели экспоната
+            if (exhibit.Photo != null)
+            {
+                using (MemoryStream ms = new MemoryStream(exhibit.Photo))
+                {
+                    pictureBox.Image = Image.FromStream(ms);
+                }
+            }
+
+            this.Controls.Add(pictureBox);
 
             currentTablesInRow++;
 

@@ -57,8 +57,7 @@ namespace ExhibitsApplication
                 PictureBox pictureBox = new PictureBox();
                 pictureBox.Dock = DockStyle.Fill;
                 pictureBox.SizeMode = PictureBoxSizeMode.Zoom;
-                pictureBox.BackColor = Color.Blue; // Синий фон
-                pictureBox.Padding = new Padding((cardWidth - pictureBox.Width) / 2, (cardHeight - pictureBox.Height) / 2, 0, 0);
+                pictureBox.BackColor = Color.Blue; // Синий фон (для отладки)
                 if (exhibit.Photo != null)
                 {
                     using (MemoryStream ms = new MemoryStream(exhibit.Photo))
@@ -66,8 +65,8 @@ namespace ExhibitsApplication
                         pictureBox.Image = Image.FromStream(ms);
                     }
                 }
-                pictureBox.Size = new Size(cardWidth, 150);
                 cardPanel.Controls.Add(pictureBox, 0, 0);
+
 
                 // Добавим вторую строку для текста
                 cardPanel.RowStyles.Add(new RowStyle(SizeType.AutoSize));
@@ -76,7 +75,7 @@ namespace ExhibitsApplication
                 yearLabel.Text = exhibit.Year;
                 yearLabel.AutoSize = true;
                 yearLabel.Margin = new Padding(5);
-                cardPanel.Controls.Add(yearLabel, 0, 2); // Добавляем третью строку для года экспоната
+                cardPanel.Controls.Add(yearLabel, 0, 2); 
 
                 Label nameLabel = new Label();
                 nameLabel.Text = exhibit.Name;
@@ -90,7 +89,7 @@ namespace ExhibitsApplication
 
                 // Устанавливаем одинаковые отступы для меток
                 nameLabel.Padding = new Padding(5);
-                yearLabel.Padding = new Padding(5);
+                yearLabel.Padding = new Padding(2);
 
                 this.Controls.Add(cardPanel);
 
@@ -102,7 +101,7 @@ namespace ExhibitsApplication
                 }
                 else
                 {
-                    startY += cardHeight + cardSpacingY; // Переход на следующую строку
+                    startY += cardHeight + cardSpacingY; 
                     currentX = offsetX;
                     currentCardsInRow = 0;
                 }

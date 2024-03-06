@@ -86,6 +86,20 @@ namespace ExhibitsApplication.Services
                         }
                     }
 
+                    // Поиск фотографии под таблицей
+                    foreach (var sibling in table.ElementsAfter())
+                    {
+                        if (sibling is Paragraph)
+                        {
+                            var picture = sibling.Descendants<DocumentFormat.OpenXml.Drawing.Blip>().FirstOrDefault();
+                            if (picture != null)
+                            {
+                                var imagePath = picture.Embed.Value;
+                                imageData = GetImageData(wordDoc, imagePath);
+                                break; // Прекращаем перебор, как только найдем изображение
+                            }
+                        }
+                    }
                     // Сохранение данных о выставке вместе с изображением
                     exhibit.Photo = imageData;
                     storage.AddExhibit(exhibit);
@@ -93,7 +107,18 @@ namespace ExhibitsApplication.Services
             }
         }
 
-
+        private byte[] GetImageData(WordprocessingDocument wordDoc, string imagePath)
+        {
+            var imagePart = (ImagePart)wordDoc.MainDocumentPart.GetPartById(imagePath);
+            using (var stream = imagePart.GetStream())
+            {
+                using (var memoryStream = new MemoryStream())
+                {
+                    stream.CopyTo(memoryStream);
+                    return memoryStream.ToArray();
+                }
+            }
+        }
         public List<ExhibitsModel> GetExhibitsByFilter(string searchTerm)
         {
             List<ExhibitsModel> exhibits = storage.GetAllExhibits();
