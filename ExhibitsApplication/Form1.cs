@@ -57,7 +57,7 @@ namespace ExhibitsApplication
                 PictureBox pictureBox = new PictureBox();
                 pictureBox.Dock = DockStyle.Fill;
                 pictureBox.SizeMode = PictureBoxSizeMode.Zoom;
-                pictureBox.BackColor = Color.Blue; // Синий фон (для отладки)
+                pictureBox.BackColor = Color.Gray; // Синий фон (для отладки)
                 if (exhibit.Photo != null)
                 {
                     using (MemoryStream ms = new MemoryStream(exhibit.Photo))
@@ -71,25 +71,30 @@ namespace ExhibitsApplication
                 // Добавим вторую строку для текста
                 cardPanel.RowStyles.Add(new RowStyle(SizeType.AutoSize));
 
-                Label yearLabel = new Label();
-                yearLabel.Text = exhibit.Year;
-                yearLabel.AutoSize = true;
-                yearLabel.Margin = new Padding(5);
-                cardPanel.Controls.Add(yearLabel, 0, 2); 
+                Label cipherLabel = new Label();
+                cipherLabel.Text = exhibit.FundCode;
+                cipherLabel.AutoSize = true;
+                cipherLabel.Margin = new Padding(1);
+
+                cardPanel.Controls.Add(cipherLabel, 0, 2); 
 
                 Label nameLabel = new Label();
                 nameLabel.Text = exhibit.Name;
                 nameLabel.AutoSize = true;
-                nameLabel.Margin = new Padding(3);
-                nameLabel.Click += (sender, e) => ShowExhibitForm(exhibit);
-                cardPanel.Controls.Add(nameLabel, 0, 1);
-                cardPanel.Controls.Add(yearLabel, 0, 2);
+                nameLabel.Margin = new Padding(1);
+                nameLabel.Font = new Font(nameLabel.Font.FontFamily, 11); // Устанавливаем размер шрифта 10
 
-                nameLabel.Height = 30; // Задаем высоту nameLabel
+                //nameLabel.Height = 30;
+                nameLabel.Click += (sender, e) => ShowExhibitForm(exhibit);
+
+                cardPanel.Controls.Add(nameLabel, 0, 1);
+                cardPanel.Controls.Add(cipherLabel, 0, 2);
+
+
 
                 // Устанавливаем одинаковые отступы для меток
-                nameLabel.Padding = new Padding(5);
-                yearLabel.Padding = new Padding(2);
+                nameLabel.Padding = new Padding(2);
+                cipherLabel.Padding = new Padding(2);
 
                 this.Controls.Add(cardPanel);
 
@@ -108,8 +113,6 @@ namespace ExhibitsApplication
             }
         }
 
-
-
         private void ShowExhibitForm(ExhibitsModel exhibit)
         {
             ExhibitsForm exhibitForm = new ExhibitsForm(exhibit);
@@ -123,9 +126,17 @@ namespace ExhibitsApplication
 
             if (openFileDialog.ShowDialog() == DialogResult.OK)
             {
+                label1.Visible = false;
+                browseButton.Visible = false;
+
                 string filePath = openFileDialog.FileName;
                 exhibitParser.ParseWordDocument(filePath);
                 DisplayExhibits(exhibitsStorage.GetAllExhibits());
+
+                textBox1.Visible = true;
+                button1.Visible = true;
+                button2.Visible = true;
+
             }
         }
 
@@ -136,6 +147,7 @@ namespace ExhibitsApplication
             var filteredList = exhibitParser.GetExhibitsByFilter(name);
             DisplayExhibits(filteredList);
         }
+
         private void ClearExhibitCards()
         {
             List<Control> controlsToRemove = new List<Control>();

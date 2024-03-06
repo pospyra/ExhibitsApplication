@@ -3,6 +3,7 @@ using ExhibitsApplication.Services;
 using System;
 using System.Collections.Generic;
 using System.Drawing;
+using System.IO;
 using System.Windows.Forms;
 
 namespace ExhibitsApplication.Forms
@@ -11,15 +12,12 @@ namespace ExhibitsApplication.Forms
     {
         private List<ExhibitsModel> exhibits;
         private int currentExhibitIndex = 0;
-        private DataGridView dataGridView;
-        private PictureBox pictureBox;
         private Timer timer;
         public SlideShowForm()
         {
             InitializeComponent();
             GetExhibits();
             InitializeDataGridView();
-            InitializePictureBox();
             DisplayCurrentExhibit();
 
             timer = new Timer();
@@ -34,34 +32,25 @@ namespace ExhibitsApplication.Forms
 
         private void InitializeDataGridView()
         {
-            dataGridView = new DataGridView();
-            dataGridView.Location = new Point(20, 20);
-            dataGridView.Size = new Size(600, 350);
             dataGridView.AllowUserToAddRows = false;
             dataGridView.AutoSizeColumnsMode = DataGridViewAutoSizeColumnsMode.Fill;
             dataGridView.BackgroundColor = Color.White;
-            dataGridView.Columns.Add("Property", "Property");
-            dataGridView.Columns.Add("Value", "Value");
+            dataGridView.Columns.Add("Property", "");
+            dataGridView.Columns.Add("Value", "");
             dataGridView.AutoSizeRowsMode = DataGridViewAutoSizeRowsMode.AllCells;
             dataGridView.Columns[1].DefaultCellStyle.WrapMode = DataGridViewTriState.True;
 
             this.Controls.Add(dataGridView);
         }
 
-        private void InitializePictureBox()
-        {
-            pictureBox = new PictureBox();
-            pictureBox.Size = new Size(200, 300);
-            pictureBox.SizeMode = PictureBoxSizeMode.Zoom;
-            pictureBox.Location = new Point(dataGridView.Right + 20, dataGridView.Top);
-            this.Controls.Add(pictureBox);
-        }
+
 
         private void DisplayCurrentExhibit()
         {
             if (exhibits.Count > 0 && currentExhibitIndex >= 0 && currentExhibitIndex < exhibits.Count)
             {
                 ExhibitsModel exhibit = exhibits[currentExhibitIndex];
+                dataGridView.ClearSelection();
                 dataGridView.Rows.Clear();
                 dataGridView.Rows.Add("Инвентарный номер:", exhibit.InventoryNumber);
                 dataGridView.Rows.Add("Название:", exhibit.Name);
@@ -75,6 +64,16 @@ namespace ExhibitsApplication.Forms
                 dataGridView.Rows.Add("Источник поступления:", exhibit.Source);
                 dataGridView.Rows.Add("Дата регистрации:", exhibit.RegistratonDate);
 
+                pictureBox1.SizeMode = PictureBoxSizeMode.Zoom;
+
+                // Отображение фотографии
+                if (exhibit.Photo != null)
+                {
+                    using (MemoryStream ms = new MemoryStream(exhibit.Photo))
+                    {
+                        pictureBox1.Image = Image.FromStream(ms);
+                    }
+                }
             }
         }
 

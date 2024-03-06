@@ -20,7 +20,7 @@ namespace ExhibitsApplication.Forms
         private void ShowInfo()
         {
             int startY = 100;
-            int dataGridViewWidth = 600; // Указываем новую ширину DataGridView
+            int dataGridView1Width = 600; // Указываем новую ширину dataGridView1
             int maxTablesPerRow = 3; // Максимальное количество таблиц в строке
             int tableSpacing = 20; // Расстояние между таблицами
             int pictureBoxWidth = 300; // Ширина PictureBox
@@ -29,55 +29,40 @@ namespace ExhibitsApplication.Forms
             int currentX = 20;
 
 
-            Label nameLabel = new Label();
             nameLabel.Text = exhibit.Name;
             nameLabel.AutoSize = true;
-            nameLabel.Location = new Point(currentX, startY);
 
-            this.Controls.Add(nameLabel); // Добавляем метку на форму
+            dataGridView1.ClearSelection();
+            dataGridView1.AllowUserToAddRows = false;
+            dataGridView1.AutoSizeColumnsMode = DataGridViewAutoSizeColumnsMode.Fill; // Режим заполнения столбцов
+            dataGridView1.BackgroundColor = Color.White;
 
-            DataGridView dataGridView = new DataGridView();
-            dataGridView.Location = new System.Drawing.Point(currentX, startY + nameLabel.Height); // Учитываем высоту метки
-            dataGridView.Size = new System.Drawing.Size(dataGridViewWidth, 350);
-            dataGridView.AllowUserToAddRows = false;
-            dataGridView.AutoSizeColumnsMode = DataGridViewAutoSizeColumnsMode.Fill; // Режим заполнения столбцов
-            dataGridView.BackgroundColor = Color.White;
-
-            dataGridView.Columns.Add("Property", "");
-            dataGridView.Columns.Add("Value", "");
+            dataGridView1.Columns.Add("Property", "");
+            dataGridView1.Columns.Add("Value", "");
 
             // Установка свойства WrapMode для второго столбца
-            dataGridView.Columns[1].DefaultCellStyle.WrapMode = DataGridViewTriState.True;
+            dataGridView1.Columns[1].DefaultCellStyle.WrapMode = DataGridViewTriState.True;
 
 
-            dataGridView.Rows.Add("Инвентарный номер:", exhibit.InventoryNumber);
-            dataGridView.Rows.Add("Название:", exhibit.Name);
-            dataGridView.Rows.Add("Шифр фондовой коллекции:", exhibit.FundCode);
-            dataGridView.Rows.Add("Место и время изготовления:", exhibit.Year);
-            dataGridView.Rows.Add("Количество:", exhibit.Quantity);
-            dataGridView.Rows.Add("Материал, техника изготовления:", exhibit.Material);
-            dataGridView.Rows.Add("Размер:", exhibit.Size);
-            dataGridView.Rows.Add("Состояние сохранности:", exhibit.Condition);
-            dataGridView.Rows.Add("Описание музейного предмета:", exhibit.Description);
-            dataGridView.Rows.Add("Источник поступления:", exhibit.Source);
-            dataGridView.Rows.Add("Дата регистрации:", exhibit.RegistratonDate);
+            dataGridView1.Rows.Add("Инвентарный номер:", exhibit.InventoryNumber);
+            dataGridView1.Rows.Add("Название:", exhibit.Name);
+            dataGridView1.Rows.Add("Шифр фондовой коллекции:", exhibit.FundCode);
+            dataGridView1.Rows.Add("Место и время изготовления:", exhibit.Year);
+            dataGridView1.Rows.Add("Количество:", exhibit.Quantity);
+            dataGridView1.Rows.Add("Материал, техника изготовления:", exhibit.Material);
+            dataGridView1.Rows.Add("Размер:", exhibit.Size);
+            dataGridView1.Rows.Add("Состояние сохранности:", exhibit.Condition);
+            dataGridView1.Rows.Add("Описание музейного предмета:", exhibit.Description);
+            dataGridView1.Rows.Add("Источник поступления:", exhibit.Source);
+            dataGridView1.Rows.Add("Дата регистрации:", exhibit.RegistratonDate);
 
-            dataGridView.AutoSizeRowsMode = DataGridViewAutoSizeRowsMode.AllCells;
+            dataGridView1.AutoSizeRowsMode = DataGridViewAutoSizeRowsMode.AllCells;
 
-            this.Controls.Add(dataGridView);
+            this.Controls.Add(dataGridView1);
 
             // Размещаем PictureBox справа от таблицы
 
-            // Определяем размеры и размещение PictureBox
-            int pictureBoxHeight = dataGridView.Height; // Высота PictureBox будет такой же, как у DataGridView
-            int pictureBoxX = currentX + dataGridViewWidth + tableSpacing; // Располагаем справа от DataGridView
-            int pictureBoxY = startY + nameLabel.Height; // Учитываем высоту метки
-
-            PictureBox pictureBox = new PictureBox();
-            pictureBox.Location = new Point(pictureBoxX, pictureBoxY);
-            pictureBox.Size = new Size(pictureBoxWidth, pictureBoxHeight); // Изменяем размер PictureBox
             pictureBox.SizeMode = PictureBoxSizeMode.Zoom;
-            pictureBox.BackColor = Color.Blue; // Просто для демонстрации, замените на вашу фотографию
 
             // Проверяем, что фотография доступна в модели экспоната
             if (exhibit.Photo != null)
@@ -94,7 +79,7 @@ namespace ExhibitsApplication.Forms
 
             if (currentTablesInRow < maxTablesPerRow)
             {
-                currentX += dataGridViewWidth + tableSpacing;
+                currentX += dataGridView1Width + tableSpacing;
             }
             else
             {
